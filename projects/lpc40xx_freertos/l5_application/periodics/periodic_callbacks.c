@@ -1,13 +1,12 @@
+#include "periodic_callbacks.h"
 #include "FreeRTOS.h"
-#include "task.h"
-
 #include "board_io.h"
 #include "gpio.h"
-#include "periodic_callbacks.h"
 #include "switch_led_logic.h"
+#include "task.h"
 
 // Uncomment the following for Lab-Part3
-//#define LAB_01_P3
+#define LAB_01_P3
 
 /******************************************************************************
  * Your board will reset if the periodic function does not return within its deadline

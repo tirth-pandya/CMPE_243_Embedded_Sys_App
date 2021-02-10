@@ -9,6 +9,7 @@
 #include "Mockboard_io.h"
 #include "Mockgpio.h"
 #include "Mockswitch_led_logic.h"
+#include "Mocktask.h"
 // Include the source we wish to test
 #include "periodic_callbacks.h"
 
