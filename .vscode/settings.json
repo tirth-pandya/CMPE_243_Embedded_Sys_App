@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "cstring": "c",
+        "mockgpio.h": "c",
+        "queue.h": "c",
+        "mockqueue.h": "c",
+        "gps.h": "c",
+        "fake_gps.h": "c",
+        "periodic_callbacks.h": "c"
+    }
+}
