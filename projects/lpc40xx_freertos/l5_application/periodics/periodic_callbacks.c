@@ -1,8 +1,29 @@
+#include <stdio.h>
+
 #include "periodic_callbacks.h"
 
 #include "board_io.h"
 #include "gpio.h"
 
+#include "acceleration.h"
+#include "can_bus.h"
+#include "can_handler.h"
+
+#define CAN_RX
+//#define CAN_TX
+
+void handle_led_with_accmtr(int16_t accmtr_val) {
+  if (accmtr_val <= (-512) && accmtr_val > (-1024))
+    gpio__toggle(board_io__get_led0());
+  else if (accmtr_val <= 0 && accmtr_val > (-512))
+    gpio__toggle(board_io__get_led1());
+  else if (accmtr_val <= 512 && accmtr_val > 0)
+    gpio__toggle(board_io__get_led2());
+  else if (accmtr_val <= 1024 && accmtr_val > 512)
+    gpio__toggle(board_io__get_led3());
+  else
+    fprintf(stderr, "Unable to toggle leds");
+}
 /******************************************************************************
  * Your board will reset if the periodic function does not return within its deadline
  * For 1Hz, the function must return within 1000ms
@@ -10,6 +31,10 @@
  */
 void periodic_callbacks__initialize(void) {
   // This method is invoked once when the periodic tasks are created
+  can__init(can1, 100, 100, 100, NULL, NULL);
+  can__bypass_filter_accept_all_msgs();
+  can__reset_bus(can1);
+  acceleration__init();
 }
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {
@@ -20,6 +45,15 @@ void periodic_callbacks__1Hz(uint32_t callback_count) {
 void periodic_callbacks__10Hz(uint32_t callback_count) {
   gpio__toggle(board_io__get_led1());
   // Add your code here
+
+#ifdef CAN_RX
+  can_handler__handle_all_incoming_messages();
+  can_handler__manage_mia_10hz();
+#endif
+
+#ifdef CAN_TX
+  can_handler__transmit_message_10hz();
+#endif
 }
 void periodic_callbacks__100Hz(uint32_t callback_count) {
   gpio__toggle(board_io__get_led2());
@@ -35,3 +69,4 @@ void periodic_callbacks__1000Hz(uint32_t callback_count) {
   gpio__toggle(board_io__get_led3());
   // Add your code here
 }
+
