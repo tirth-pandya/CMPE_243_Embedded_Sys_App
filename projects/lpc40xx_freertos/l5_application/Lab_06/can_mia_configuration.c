@@ -5,6 +5,7 @@
 const uint32_t dbc_mia_threshold_SENSOR_ACCMTR = 3000; // 3000ms
 const uint32_t dbc_mia_threshold_SENSOR_BUTTON = 300;  // 300ms
 
+// Replacement values initialized to 0
 const dbc_SENSOR_ACCMTR_s dbc_mia_replacement_ACCMTR_values;
 const dbc_SENSOR_BUTTON_s dbc_mia_replacement_button;
 

@@ -28,9 +28,9 @@ void test__periodic_callbacks__initialize(void) {
   periodic_callbacks__initialize();
 }
 
-void test__periodic_callbacks__1Hz(void) {
-  gpio_s gpio = {};
-  board_io__get_led0_ExpectAndReturn(gpio);
-  gpio__toggle_Expect(gpio);
-  periodic_callbacks__1Hz(0);
-}
+// void test__periodic_callbacks__1Hz(void) {
+//   gpio_s gpio = {};
+//   board_io__get_led0_ExpectAndReturn(gpio);
+//   gpio__toggle_Expect(gpio);
+//   periodic_callbacks__1Hz(0);
+// }

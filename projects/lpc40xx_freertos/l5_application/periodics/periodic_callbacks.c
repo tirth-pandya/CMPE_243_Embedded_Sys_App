@@ -12,18 +12,6 @@
 #define CAN_RX
 //#define CAN_TX
 
-void handle_led_with_accmtr(int16_t accmtr_val) {
-  if (accmtr_val <= (-512) && accmtr_val > (-1024))
-    gpio__toggle(board_io__get_led0());
-  else if (accmtr_val <= 0 && accmtr_val > (-512))
-    gpio__toggle(board_io__get_led1());
-  else if (accmtr_val <= 512 && accmtr_val > 0)
-    gpio__toggle(board_io__get_led2());
-  else if (accmtr_val <= 1024 && accmtr_val > 512)
-    gpio__toggle(board_io__get_led3());
-  else
-    fprintf(stderr, "Unable to toggle leds");
-}
 /******************************************************************************
  * Your board will reset if the periodic function does not return within its deadline
  * For 1Hz, the function must return within 1000ms
@@ -38,12 +26,12 @@ void periodic_callbacks__initialize(void) {
 }
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {
-  gpio__toggle(board_io__get_led0());
+  // gpio__toggle(board_io__get_led0());
   // Add your code here
 }
 
 void periodic_callbacks__10Hz(uint32_t callback_count) {
-  gpio__toggle(board_io__get_led1());
+  // gpio__toggle(board_io__get_led1());
   // Add your code here
 
 #ifdef CAN_RX
@@ -56,7 +44,7 @@ void periodic_callbacks__10Hz(uint32_t callback_count) {
 #endif
 }
 void periodic_callbacks__100Hz(uint32_t callback_count) {
-  gpio__toggle(board_io__get_led2());
+  // gpio__toggle(board_io__get_led2());
   // Add your code here
 }
 
@@ -69,4 +57,3 @@ void periodic_callbacks__1000Hz(uint32_t callback_count) {
   gpio__toggle(board_io__get_led3());
   // Add your code here
 }
-
