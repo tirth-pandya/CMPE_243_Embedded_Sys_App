@@ -9,9 +9,6 @@
 #include "can_bus.h"
 #include "can_handler.h"
 
-#define CAN_RX
-//#define CAN_TX
-
 /******************************************************************************
  * Your board will reset if the periodic function does not return within its deadline
  * For 1Hz, the function must return within 1000ms
@@ -31,9 +28,6 @@ void periodic_callbacks__1Hz(uint32_t callback_count) {
 }
 
 void periodic_callbacks__10Hz(uint32_t callback_count) {
-  // gpio__toggle(board_io__get_led1());
-  // Add your code here
-
 #ifdef CAN_RX
   can_handler__handle_all_incoming_messages();
   can_handler__manage_mia_10hz();
@@ -42,6 +36,9 @@ void periodic_callbacks__10Hz(uint32_t callback_count) {
 #ifdef CAN_TX
   can_handler__transmit_message_10hz();
 #endif
+
+  // gpio__toggle(board_io__get_led1());
+  // Add your code here
 }
 void periodic_callbacks__100Hz(uint32_t callback_count) {
   // gpio__toggle(board_io__get_led2());
