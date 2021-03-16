@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "can_bus.h": "c",
+        "project.h": "c"
+    }
+}
