@@ -1,6 +1,10 @@
+#include <stdio.h>
+
 #include "periodic_callbacks.h"
 
 #include "board_io.h"
+#include "can_bus.h"
+#include "can_handler.h"
 #include "gpio.h"
 
 /******************************************************************************
@@ -10,19 +14,25 @@
  */
 void periodic_callbacks__initialize(void) {
   // This method is invoked once when the periodic tasks are created
+  can__init(can1, 100, 50, 50, NULL, NULL);
+  can__bypass_filter_accept_all_msgs();
+  can__reset_bus(can1);
 }
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {
-  gpio__toggle(board_io__get_led0());
+  // gpio__toggle(board_io__get_led0());
+  can_handler__handle_all_incoming_message();
   // Add your code here
 }
 
 void periodic_callbacks__10Hz(uint32_t callback_count) {
-  gpio__toggle(board_io__get_led1());
+  // gpio__toggle(board_io__get_led1());
+
+  // can_handler__manage_mia_10hz();
   // Add your code here
 }
 void periodic_callbacks__100Hz(uint32_t callback_count) {
-  gpio__toggle(board_io__get_led2());
+  // gpio__toggle(board_io__get_led2());
   // Add your code here
 }
 
@@ -32,6 +42,6 @@ void periodic_callbacks__100Hz(uint32_t callback_count) {
  * This may be disabled based on intialization of periodic_scheduler__initialize()
  */
 void periodic_callbacks__1000Hz(uint32_t callback_count) {
-  gpio__toggle(board_io__get_led3());
+  // gpio__toggle(board_io__get_led3());
   // Add your code here
 }

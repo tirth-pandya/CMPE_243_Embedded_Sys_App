@@ -1,6 +1,8 @@
-#include "can_handler.h"
+#include <stdio.h>
+
 #include "board_io.h"
 #include "can_bus.h"
+#include "can_handler.h"
 #include "can_mia.h"
 #include "gpio.h"
 #include "motor_node.h"
@@ -18,6 +20,7 @@ void can_handler__handle_all_incoming_message(void) {
     };
 
     if (dbc_decode_DRIVER_TO_MOTOR(&rx_motor_command, rx_msg_header, rx_msg.data.bytes)) {
+      fprintf(stderr, "Received \n");
       motor_node__run_once(rx_motor_command);
     }
   }

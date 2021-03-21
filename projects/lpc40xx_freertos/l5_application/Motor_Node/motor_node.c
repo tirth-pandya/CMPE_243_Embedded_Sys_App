@@ -1,6 +1,7 @@
 #include "motor_node.h"
 #include "board_io.h"
 #include "gpio.h"
+#include <stdio.h>
 
 static void steer_left(void) {
   gpio__reset(board_io__get_led1());
@@ -20,10 +21,11 @@ static bool motor_node__handle_speed(float motor_speed) {
   bool status;
 
   if (motor_speed < 0) {
-    gpio__set(board_io__get_led2());
+    gpio__reset(board_io__get_led2());
+    fprintf(stderr, "motor speed %f\n", motor_speed);
     status = true;
   } else if (motor_speed >= 0) {
-    gpio__reset(board_io__get_led2());
+    gpio__set(board_io__get_led2());
     status = true;
   } else {
     status = false;

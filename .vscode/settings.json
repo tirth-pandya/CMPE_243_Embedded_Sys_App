@@ -4,6 +4,7 @@
         "project.h": "c",
         "board_io.h": "c",
         "motor_node.h": "c",
-        "mockgpio.h": "c"
+        "mockgpio.h": "c",
+        "can_mia.h": "c"
     }
 }
