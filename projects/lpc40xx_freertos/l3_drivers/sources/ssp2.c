@@ -9,7 +9,8 @@
 
 /**
  * These are the DMA request numbers that the hardware maps
- * See LPC40xx user manual, chapter: General Purpose DMA controller, Table 696: DMA connections
+ * See LPC40xx user manual, chapter: General Purpose DMA controller, Table 696:
+ * DMA connections
  */
 #define SSP2__DMA_REQUEST_TX 6UL
 #define SSP2__DMA_REQUEST_RX 7UL
@@ -103,9 +104,10 @@ void ssp2__dma_init(void) {
   ssp2__dma_rx->CLLI = 0;
   ssp2__dma_tx->CLLI = 0;
 
-  // These registers are only initialized once, but this optimization makes no measurable difference
-  // ssp2__dma_tx->CDestAddr = (uint32_t)(&(LPC_SSP2->DR));
-  // ssp2__dma_rx->CSrcAddr = (uint32_t)(&(LPC_SSP2->DR));
+  // These registers are only initialized once, but this optimization makes no
+  // measurable difference ssp2__dma_tx->CDestAddr =
+  // (uint32_t)(&(LPC_SSP2->DR)); ssp2__dma_rx->CSrcAddr =
+  // (uint32_t)(&(LPC_SSP2->DR));
 }
 
 ssp_dma_error_e ssp2__dma_transfer_block(unsigned char *buffer_pointer, uint32_t num_bytes, bool is_write_op) {
@@ -179,7 +181,8 @@ ssp_dma_error_e ssp2__dma_transfer_block(unsigned char *buffer_pointer, uint32_t
    *      - Read data into buffer_pointer
    *      - Increment destination
    *
-   * Note: Setting destination burst of 2 or 4 bytes makes no difference (1 << 15)
+   * Note: Setting destination burst of 2 or 4 bytes makes no difference (1 <<
+   * 15)
    */
   ssp2__dma_rx->CSrcAddr = (uint32_t)(&(LPC_SSP2->DR));
   if (is_write_op) {

@@ -6,7 +6,8 @@
 #include "lpc40xx.h"
 #include "lpc_peripherals.h"
 
-/// Alias the LPC defined typedef in case we have to define it differently for a different CPU
+/// Alias the LPC defined typedef in case we have to define it differently for a
+/// different CPU
 typedef LPC_UART_TypeDef lpc_uart;
 
 /**
@@ -15,12 +16,12 @@ typedef LPC_UART_TypeDef lpc_uart;
  */
 typedef struct {
   lpc_uart *registers;
-  const char *rtos_isr_trace_name;
   QueueHandle_t queue_transmit;
   QueueHandle_t queue_receive;
 } uart_s;
 
-/// @{ ISR functions for all UARTs; these are lightweight that simply call uart__isr_common()
+/// @{ ISR functions for all UARTs; these are lightweight that simply call
+/// uart__isr_common()
 static void uart0_isr(void);
 static void uart1_isr(void);
 static void uart2_isr(void);
@@ -39,14 +40,15 @@ static void uart__isr_common(uart_s *uart_type); ///< Common function for all UA
  * Some UARTs have a different memory map, but it matches the base registers, so
  * we can use the same memory map to provide a generic driver for all UARTs
  *
- * UART1 for instance has same registers like UART0, but has additional modem control registers
- * but these extra registers are at the end of the memory map that matches with UART0
+ * UART1 for instance has same registers like UART0, but has additional modem
+ * control registers but these extra registers are at the end of the memory map
+ * that matches with UART0
  */
 static uart_s uarts[] = {
-    {(lpc_uart *)LPC_UART0, "Uart0"},
-    {(lpc_uart *)LPC_UART1, "Uart1"},
-    {(lpc_uart *)LPC_UART2, "Uart2"},
-    {(lpc_uart *)LPC_UART3, "Uart3"},
+    {(lpc_uart *)LPC_UART0},
+    {(lpc_uart *)LPC_UART1},
+    {(lpc_uart *)LPC_UART2},
+    {(lpc_uart *)LPC_UART3},
 };
 
 static void (*const uart__isrs[])(void) = {uart0_isr, uart1_isr, uart2_isr, uart3_isr};
@@ -96,8 +98,9 @@ static bool uart__clear_receive_fifo(uart_s *uart_type) {
   BaseType_t higher_priority_task_woke = 0;
 
   /**
-   * While receive Hardware FIFO not empty, keep queuing the data. Even if xQueueSendFromISR()
-   * fails (Queue is full), we still need to read RBR register otherwise interrupt will not clear
+   * While receive Hardware FIFO not empty, keep queuing the data. Even if
+   * xQueueSendFromISR() fails (Queue is full), we still need to read RBR
+   * register otherwise interrupt will not clear
    */
   while (uart_type->registers->LSR & char_available_bitmask) {
     const char received_byte = uart_type->registers->RBR;
@@ -113,7 +116,13 @@ static bool uart__clear_receive_fifo(uart_s *uart_type) {
 
 static void uart__enable_receive_and_transmit_interrupts(uart_e uart) {
   uart_s *uart_type = &uarts[uart];
-  lpc_peripheral__enable_interrupt(uart_peripheral_ids[uart], uart__isrs[uart], uart_type->rtos_isr_trace_name);
+  lpc_peripheral__enable_interrupt(uart_peripheral_ids[uart], uart__isrs[uart]);
+
+  const uint32_t enable_rx_tx_fifo = (1 << 0) | (1 << 6);
+  const uint32_t reset_rx_tx_fifo = (1 << 1) | (1 << 2);
+
+  uart_type->registers->FCR = enable_rx_tx_fifo;
+  uart_type->registers->FCR = reset_rx_tx_fifo;
 
   const uint32_t enable_rx_tx_interrupts = (1 << 0) | (1 << 1) | (1 << 2); // B0:Rx, B1: Tx
   uart_type->registers->IER = enable_rx_tx_interrupts;
@@ -170,26 +179,22 @@ void uart__init(uart_e uart, uint32_t peripheral_clock, uint32_t baud_rate) {
   const uint8_t dlab_bit = (1 << 7);
   const uint8_t eight_bit_datalen = 3;
 
+  // 2-stop bits helps improve baud rate error; you can remove this if bandwidth
+  // is critical to you
+  const uint8_t stop_bits_is_2 = (1 << 2);
+
   lpc_uart *uart_regs = uarts[uart].registers;
 
   uart_regs->LCR = dlab_bit; // Set DLAB bit to access DLM & DLL
   uart_regs->DLM = (divider >> 8) & 0xFF;
   uart_regs->DLL = (divider >> 0) & 0xFF;
 
-  /* Bootloader uses Uart0 fractional dividers and can wreck havoc in our baud rate code, so re-initialize it
-   * Lesson learned: DO NOT RELY ON RESET VALUES
+  /* Bootloader uses Uart0 fractional dividers and can wreck havoc in our baud
+   * rate code, so re-initialize it Lesson learned: DO NOT RELY ON RESET VALUES
    */
   const uint32_t default_reset_fdr_value = (1 << 4);
   uart_regs->FDR = default_reset_fdr_value;
-
-  // Important: Set FCR value before enable UART by writing the LCR register
-  // Important: FCR is a write-only register, and we cannot use R/M/W such as |=
-  const uint8_t enable_fifo = (1 << 0); // Must be done!
-  const uint8_t eight_char_timeout = (2 << 6);
-  uart_regs->FCR = enable_fifo;
-  uart_regs->FCR = enable_fifo | eight_char_timeout;
-
-  uart_regs->LCR = eight_bit_datalen; // DLAB is reset back to zero also
+  uart_regs->LCR = eight_bit_datalen | stop_bits_is_2; // DLAB is reset back to zero also
 }
 
 bool uart__is_initialized(uart_e uart) {
@@ -207,16 +212,12 @@ bool uart__enable_queues(uart_e uart, QueueHandle_t queue_receive, QueueHandle_t
     // Ensure that the queues are not already enabled
     if (!uart__is_receive_queue_enabled(uart) && NULL != queue_receive) {
       uart_type->queue_receive = queue_receive;
-      const char name[] = {'U', '0' + (char)uart, 'R', 'X', 'Q', '\0'};
-      vTraceSetQueueName(queue_receive, name);
-      (void)name; // avoid warning if trace is disabled
+      // vTraceSetQueueName(queue_receive, "U RXQ"); // TODO: should be unique
     }
 
     if (!uart__is_transmit_queue_enabled(uart) && NULL != queue_transmit) {
       uart_type->queue_transmit = queue_transmit;
-      const char name[] = {'U', '0' + (char)uart, 'T', 'X', 'Q', '\0'};
-      vTraceSetQueueName(queue_transmit, name);
-      (void)name; // avoid warning if trace is disabled
+      // vTraceSetQueueName(queue_transmit, "U TXQ"); // TODO: should be unique
     }
 
     // Enable peripheral_id interrupt if all is well
@@ -236,11 +237,13 @@ bool uart__polled_get(uart_e uart, char *input_byte) {
   const bool queue_is_enabled = uart__is_receive_queue_enabled(uart);
 
   if (uart__is_initialized(uart)) {
-    /* If the RTOS is running and queues are enabled, then we will be unable to access the
-     * RBR register directly since the interrupt would occur and read out the RBR.
+    /* If the RTOS is running and queues are enabled, then we will be unable to
+     * access the RBR register directly since the interrupt would occur and read
+     * out the RBR.
      *
      * So when the user calls this function with the RTOS and queues enabled,
-     * then we opt to block forever using uart__get() to provide 'polled' behavior.
+     * then we opt to block forever using uart__get() to provide 'polled'
+     * behavior.
      */
     if (rtos_is_running && queue_is_enabled) {
       status = uart__get(uart, input_byte, UINT32_MAX);
@@ -296,8 +299,9 @@ bool uart__put(uart_e uart, char output_byte, uint32_t timeout_ms) {
     // Deposit to the transmit queue for now
     status = xQueueSend(uarts[uart].queue_transmit, &output_byte, RTOS_MS_TO_TICKS(timeout_ms));
 
-    /* 'Transmit Complete Interrupt' may have already fired when we get here, so if there is no further pending data
-     * to be sent, it will not fire again to send any data. Hence, we check here in a critical section if transmit
+    /* 'Transmit Complete Interrupt' may have already fired when we get here, so
+     * if there is no further pending data to be sent, it will not fire again to
+     * send any data. Hence, we check here in a critical section if transmit
      * holder register is empty, and kick-off the tranmisssion
      */
     portENTER_CRITICAL();
@@ -307,7 +311,8 @@ bool uart__put(uart_e uart, char output_byte, uint32_t timeout_ms) {
 
       if (uart_regs->LSR & uart_tx_is_idle) {
         /* Receive oldest char from the queue to send
-         * Since we are inside a critical section, we use FromISR() FreeRTOS API  variant
+         * Since we are inside a critical section, we use FromISR() FreeRTOS API
+         * variant
          */
         if (xQueueReceiveFromISR(uarts[uart].queue_transmit, &output_byte, NULL)) {
           uart_regs->THR = output_byte;

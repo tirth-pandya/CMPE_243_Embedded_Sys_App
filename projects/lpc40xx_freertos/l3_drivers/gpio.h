@@ -15,7 +15,8 @@ typedef enum {
 
 /**
  * Each pin on LPC40xx has up to 8 functions
- * The functions are specific to a pin and vary; only function 0 is common, which is a GPIO
+ * The functions are specific to a pin and vary; only function 0 is common,
+ * which is a GPIO
  */
 typedef enum {
   GPIO__FUNCITON_0_IO_PIN = 0,
@@ -33,8 +34,8 @@ typedef enum {
  * All further APIs need instance of this struct to operate
  */
 typedef struct {
-  gpio__port_e port_number : 3;
-  uint8_t pin_number : 5;
+  uint8_t port_number;
+  uint8_t pin_number;
 } gpio_s;
 
 /**
@@ -42,20 +43,21 @@ typedef struct {
  * @param pin_number_0_to_31 The pin number from 0-31
  */
 gpio_s gpio__construct(gpio__port_e port, uint8_t pin_number_0_to_31);
-gpio_s gpio__construct_as_input(gpio__port_e port, uint8_t pin_number_0_to_31);  ///< construct then set as input
-gpio_s gpio__construct_as_output(gpio__port_e port, uint8_t pin_number_0_to_31); ///< construct then set as output
+gpio_s gpio__construct_as_input(gpio__port_e port,
+                                uint8_t pin_number_0_to_31); ///< construct then set as input
+gpio_s gpio__construct_as_output(gpio__port_e port,
+                                 uint8_t pin_number_0_to_31); ///< construct then set as output
 
-/// Construct and then set the pin function. In this case, DIR will not impact the pin
+/// Construct and then set the pin function. In this case, DIR will not impact
+/// the pin
 gpio_s gpio__construct_with_function(gpio__port_e port, uint8_t pin_number_0_to_31, gpio__function_e function);
 
 /// Sets the function for a pin; @see gpio__function_e
 void gpio__set_function(gpio_s gpio, gpio__function_e function);
 
-/// Most of the pins are NOT open drain on power-up; this enables pin's open-collector mode
+/// Most of the pins are NOT open drain on power-up; this enables pin's
+/// open-collector mode
 void gpio__enable_open_drain(gpio_s gpio);
-
-/// Sets the function mode of a pin to enable pull down resistors
-void gpio__enable_pull_down_resistors(gpio_s gpio);
 
 /**
  * @{
