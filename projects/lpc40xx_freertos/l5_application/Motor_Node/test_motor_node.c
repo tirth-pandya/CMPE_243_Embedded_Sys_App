@@ -10,51 +10,103 @@ void setup(void){};
 
 void tearDown(void){};
 
-// void test_motor_node__moving_forward(void) {
-//   float speed = 1;
-//   gpio_s gpio = {};
+void test_motor_node__moving_forward(void) {
+  // gpio_s gpio = {};
 
-//   board_io__get_led2_ExpectAndReturn(gpio);
-//   gpio__reset_Expect(gpio);
+  // Assuming steering straight at angle 0
+  dbc_DRIVER_TO_MOTOR_s test_val = {5, 0};
 
-//   // motor_node__run_once(motr_command);
-//   //   motor_node__handle_speed(speed);
-// }
+  // Speed
+  gpio__reset_Expect(led_blue_s);
+
+  // Steer
+  gpio__set_Expect(led_red_l);
+  gpio__set_Expect(led_green_r);
+
+  motor_node__run_once(test_val);
+}
+
+void test_motor_node__moving_forward_zero_speed(void) {
+  // gpio_s gpio = {};
+
+  // Assuming steering straight at angle 0
+  dbc_DRIVER_TO_MOTOR_s test_val = {0, 0};
+
+  // Speed
+  gpio__reset_Expect(led_blue_s);
+
+  // Steer
+  gpio__set_Expect(led_red_l);
+  gpio__set_Expect(led_green_r);
+
+  motor_node__run_once(test_val);
+}
 
 void test_motor_node__moving_reverse(void) {
-  dbc_DRIVER_TO_MOTOR_s test = {};
-  float speed = -1;
-  test.MOTOR_speed = speed;
+  // gpio_s gpio = {};
 
-  gpio_s gpio = {};
-  board_io__get_led2_ExpectAndReturn(gpio);
-  gpio__reset_Expect(gpio);
+  // Assuming steering straight at angle 0
+  dbc_DRIVER_TO_MOTOR_s test_val;
+  test_val.MOTOR_speed = -5;
+  test_val.MOTOR_direction = 0;
 
-  motor_node__run_once(test);
+  // Speed
+  gpio__set_Expect(led_blue_s);
+
+  // Steer
+  gpio__set_Expect(led_red_l);
+  gpio__set_Expect(led_green_r);
+
+  motor_node__run_once(test_val);
 }
 
-void test_motor_node__move_forward_speed_zero(void) {
-  float speed = 0;
-  gpio_s gpio = {};
+void test_motor_node__steer_right(void) {
+  dbc_DRIVER_TO_MOTOR_s test_val;
 
-  board_io__get_led2_ExpectAndReturn(gpio);
-  gpio__set_Expect(gpio);
+  // Assuming speed positive val of 5;
+  test_val.MOTOR_speed = 5;
+  test_val.MOTOR_direction = 30;
 
-  motor_node__handle_speed(speed);
+  // Speed
+  gpio__reset_Expect(led_blue_s);
+
+  // Steer
+  gpio__reset_Expect(led_red_l);
+  gpio__set_Expect(led_green_r);
+
+  motor_node__run_once(test_val);
 }
 
-void test_motor_node__move_forward_speed_non_zero(void) {
-  float speed = 1;
-  gpio_s gpio = {};
+void test_motor_node__steer_left(void) {
+  dbc_DRIVER_TO_MOTOR_s test_val;
 
-  board_io__get_led2_ExpectAndReturn(gpio);
-  gpio__set_Expect(gpio);
+  // Assuming speed positive val of 10;
+  test_val.MOTOR_speed = 10;
+  test_val.MOTOR_direction = -30;
 
-  motor_node__handle_speed(speed);
+  // Speed
+  gpio__reset_Expect(led_blue_s);
+
+  // Steer
+  gpio__set_Expect(led_red_l);
+  gpio__reset_Expect(led_green_r);
+
+  motor_node__run_once(test_val);
 }
 
-void test_handle_steering__right(void) {
-  bool retVal;
-  int8_t angle = 20;
-  gpio_s led_left = {}, led_right = {};
+void test_motor_node__steer_straigh(void) {
+  dbc_DRIVER_TO_MOTOR_s test_val;
+
+  // Assuming speed positive val of 10;
+  test_val.MOTOR_speed = 10;
+  test_val.MOTOR_direction = 0;
+
+  // Speed
+  gpio__reset_Expect(led_blue_s);
+
+  // Steer
+  gpio__set_Expect(led_red_l);
+  gpio__set_Expect(led_green_r);
+
+  motor_node__run_once(test_val);
 }
