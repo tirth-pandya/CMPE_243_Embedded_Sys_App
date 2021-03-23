@@ -6,7 +6,7 @@
 #include "can_bus.h"
 #include "can_handler.h"
 #include "gpio.h"
-
+#include "motor_node.h"
 /******************************************************************************
  * Your board will reset if the periodic function does not return within its deadline
  * For 1Hz, the function must return within 1000ms
@@ -17,6 +17,7 @@ void periodic_callbacks__initialize(void) {
   can__init(can1, 100, 50, 50, NULL, NULL);
   can__bypass_filter_accept_all_msgs();
   can__reset_bus(can1);
+  motor_node__init_led();
 }
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {

@@ -5,6 +5,7 @@
         "board_io.h": "c",
         "motor_node.h": "c",
         "mockgpio.h": "c",
-        "can_mia.h": "c"
+        "can_mia.h": "c",
+        "mockmotor_node.h": "c"
     }
 }
