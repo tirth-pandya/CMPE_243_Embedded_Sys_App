@@ -21,8 +21,8 @@ static void steer_right(void) {
 }
 
 static void steer_straight(void) {
-  gpio__set(led_red_l);
-  gpio__set(led_green_r);
+  gpio__reset(led_red_l);
+  gpio__reset(led_green_r);
 }
 static bool motor_node__handle_speed(float motor_speed) {
   bool status;

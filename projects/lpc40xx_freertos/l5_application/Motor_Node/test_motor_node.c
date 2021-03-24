@@ -20,8 +20,8 @@ void test_motor_node__moving_forward(void) {
   gpio__reset_Expect(led_blue_s);
 
   // Steer
-  gpio__set_Expect(led_red_l);
-  gpio__set_Expect(led_green_r);
+  gpio__reset_Expect(led_red_l);
+  gpio__reset_Expect(led_green_r);
 
   motor_node__run_once(test_val);
 }
@@ -36,8 +36,8 @@ void test_motor_node__moving_forward_zero_speed(void) {
   gpio__reset_Expect(led_blue_s);
 
   // Steer
-  gpio__set_Expect(led_red_l);
-  gpio__set_Expect(led_green_r);
+  gpio__reset_Expect(led_red_l);
+  gpio__reset_Expect(led_green_r);
 
   motor_node__run_once(test_val);
 }
@@ -54,8 +54,8 @@ void test_motor_node__moving_reverse(void) {
   gpio__set_Expect(led_blue_s);
 
   // Steer
-  gpio__set_Expect(led_red_l);
-  gpio__set_Expect(led_green_r);
+  gpio__reset_Expect(led_red_l);
+  gpio__reset_Expect(led_green_r);
 
   motor_node__run_once(test_val);
 }
@@ -105,8 +105,8 @@ void test_motor_node__steer_straigh(void) {
   gpio__reset_Expect(led_blue_s);
 
   // Steer
-  gpio__set_Expect(led_red_l);
-  gpio__set_Expect(led_green_r);
+  gpio__reset_Expect(led_red_l);
+  gpio__reset_Expect(led_green_r);
 
   motor_node__run_once(test_val);
 }
