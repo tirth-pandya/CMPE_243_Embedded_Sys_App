@@ -3,6 +3,9 @@
 #include "board_io.h"
 #include "gpio.h"
 
+#include "fake_gps.h"
+#include "gps.h"
+
 /******************************************************************************
  * Your board will reset if the periodic function does not return within its deadline
  * For 1Hz, the function must return within 1000ms
@@ -10,16 +13,20 @@
  */
 void periodic_callbacks__initialize(void) {
   // This method is invoked once when the periodic tasks are created
+  gps__init();
+  fake_gps__init();
 }
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {
   gpio__toggle(board_io__get_led0());
   // Add your code here
+  fake_gps__run_once();
 }
 
 void periodic_callbacks__10Hz(uint32_t callback_count) {
   gpio__toggle(board_io__get_led1());
   // Add your code here
+  gps__run_once();
 }
 void periodic_callbacks__100Hz(uint32_t callback_count) {
   gpio__toggle(board_io__get_led2());
